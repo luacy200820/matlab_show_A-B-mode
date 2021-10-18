@@ -52,13 +52,13 @@ function [us_image] = show_b_mode_image(fullPath, dynamic_range)
 
 
     image([0,xlength],[y_start y_start+ylength ],us_image);
-    set(gca,'XTick',[0 0.2 0.4 0.6 0.8 1],'FontWeight','bold','FontSize',14);
+    set(gca,'XTick',[0 0.2 0.4 0.6 0.8 1],'FontWeight','bold','FontSize',18);
    % set(gca,'YTick',round_s:1:round_s+round_len);
-    set(gca,'YTick',[9.3 9.6 10 10.3],'FontWeight','bold','FontSize',14);
+    set(gca,'YTick',[9.3 9.6 10 10.3],'FontWeight','bold','FontSize',18);
     colormap(gray(256));
     axis image;
-    ylabel('Depth (mm)','FontWeight','bold','FontSize',18);
-    xlabel('Distance (mm)','FontWeight','bold','FontSize',18);
+    ylabel('Depth (mm)','FontWeight','bold','FontSize',20);
+    xlabel('Distance (mm)','FontWeight','bold','FontSize',20);
     
     title('B-mode');
     %colorbar;

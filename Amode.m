@@ -29,13 +29,14 @@ rf = rf(34:end);
 signal2D = reshape(rf,[DataLength,Aline]);% datalength: 一次訊號長度為500個點，1D->2D
 signalAvg = mean(signal2D'); %返回 A 沿大小不等于 1
 
-%% 利用傅立葉轉換計算頻率
+% 利用傅立葉轉換計算頻率
 samplePoint = 4096;
 spectrum = abs(fft(signalAvg,samplePoint)).^2;
 
-%% 計算dB 
-dB = 10*log10(spectrum/max(spectrum));
+% 計算dB 
+dB = 20*log10(spectrum/max(spectrum));
 dB = dB(1:2048);
+
 
 
 x1=linspace(61*10^(-7),64*10^(-7),500);
@@ -44,31 +45,41 @@ y1=signalAvg;
 
 
 %clf reset;
-clf reset,ax1= axes('Position',[0.12,0.12,0.7,0.75]);
+clf reset,ax1= axes('Position',[0.12,0.15,0.75,0.7]); %左邊界，下邊界，寬度，高度
 hl1 = line(x1,y1,'Color','b'); % 第一條曲線
 ax1 = gca; %設定主座標的顏色
-set(ax1,'XColor','b','YColor','b');
+set(ax1,'XColor','b','YColor','b' ,'FontSize',18);
 
-set(get(ax1,'Xlabel'),'String','Time(μs)') ;
-set(get(ax1,'Ylabel'),'String','Amplitute(mV)');
+set(get(ax1,'Xlabel'),'String','Time(μs)','Fontname', 'Arial','FontWeight','bold','FontSize',20) ;
+set(get(ax1,'Ylabel'),'String','Amplitute(mV)','Fontname', 'Arial','FontWeight','bold','FontSize',20);
 axis([6.125 6.4 -60 80]);
 
 x2=linspace(1,500,2048);            %sampling_rate = 1000MHz,取一半為500MHz
 y2=dB;
 
-ax2 = axes('Position',get(ax1,'Position'),'XAxisLocation','top','YAxisLocation','right','Color','none','XColor','r','YColor','r');
-hold on; %plot畫圖前會清空座標軸所以先hold
-axis([26 35 -6 0]);
+%     找出frequency-domain訊號>-6dB的資料範圍
+mag = y2 - max(y2); % Normalise to maximun
 
-hl2 = line(x2,y2,'Color','r','Linestyle','--','Parent',ax2);
-set(get(ax2,'Xlabel'),'String','Frequency( MHz )');
-set(get(ax2,'Ylabel'),'String','Magnitute( dB )');
+indmax = find(mag == max(mag));
+f1 = interp1(mag(1:indmax),x2(1:indmax),-6);
+f2 = interp1(mag(indmax:end),x2(indmax:end),-6);
+BW = f2- f1;
+fprintf("beamwidth: %2.3f \n",BW);
+
+ax2 = axes('Position',get(ax1,'Position'),'XAxisLocation','top','YAxisLocation','right','Color','none','XColor','r','YColor','r' ,'FontSize',18);
+hold on; %plot畫圖前會清空座標軸所以先hold
+axis([24 36 -6 0]);
+
+hl2 = line(x2,y2,'Color','r','Linestyle','--','LineWidth',(2),'Parent',ax2);
+set(get(ax2,'Xlabel'),'String','Frequency( MHz )','Fontname', 'Arial','FontWeight','bold','FontSize',20);
+set(get(ax2,'Ylabel'),'String','Magnitute( dB )','Fontname', 'Arial','FontWeight','bold','FontSize',20);
 
 linehandles = [hl1, hl2];
 cols = cell2mat(get(linehandles, 'color'));
-[~, uidx] = unique(cols, 'rows', 'stable');
-legend(linehandles(uidx), {'Time domain', 'Frequency domain'});
 
+[~, uidx] = unique(cols, 'rows', 'stable');
+legend(linehandles(uidx), {'Time domain', 'Frequency domain'},  'Location', 'northeast','box','off','FontSize',10);
+ 
 
 
 
